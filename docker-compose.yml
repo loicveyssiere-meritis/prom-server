@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    container_name: "app"
+    env_file: 
+      - ".env"
+    ports:
+      - "3000:3000"
+  prometheus:
+    image: prom/prometheus:v2.36.1
+    restart: "no"
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./data/prometheus:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--log.level=debug'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+      - '--storage.tsdb.retention.time=60d'
+  grafana:
+    image: grafana/grafana:9.0.0
+    restart: "no"
+    depends_on:
+      - prometheus
+    ports:
+      - "13000:3000"
+    volumes:
+      - ./monitoring/grafana:/etc/grafana:ro
+      - ./data/grafana/:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=grafadmin
+      - GF_SECURITY_ADMIN_PASSWORD=toto
+      - GF_USERS_ALLOW_SIGN_UP=false
+
+
+
