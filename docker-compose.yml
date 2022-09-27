@@ -1,13 +1,24 @@
 version: '3'
 
+
+volumes:
+  grafana-storage:
+  prometheus-storage:
 services:
-  app:
+  app1:
     build: .
-    container_name: "app"
+    container_name: "app1"
     env_file: 
       - ".env"
     ports:
-      - "3000:3000"
+      - "3001:3000"
+  app2:
+    build: .
+    container_name: "app2"
+    env_file: 
+      - ".env"
+    ports:
+      - "3002:3000"
   prometheus:
     image: prom/prometheus:v2.36.1
     restart: "no"
@@ -33,7 +44,7 @@ services:
       - "13000:3000"
     volumes:
       - ./monitoring/grafana:/etc/grafana:ro
-      - ./data/grafana/:/var/lib/grafana
+      - grafana-storage:/var/lib/grafana
     environment:
       - GF_SECURITY_ADMIN_USER=grafadmin
       - GF_SECURITY_ADMIN_PASSWORD=toto
