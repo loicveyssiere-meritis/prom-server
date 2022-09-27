@@ -24,8 +24,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
-  "iteration": 1664285691989,
+  "iteration": 1664294075141,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -43,12 +42,101 @@
       "type": "row"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "bars",
+            "fillOpacity": 26,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 1
+      },
+      "id": 22,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "builder",
+          "expr": "sum by(status) (myapp_incident_status)",
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Incident counts",
+      "type": "timeseries"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 1
+        "y": 9
       },
       "id": 8,
       "panels": [],
@@ -105,7 +193,7 @@
         "h": 5,
         "w": 4,
         "x": 0,
-        "y": 2
+        "y": 10
       },
       "id": 4,
       "options": {
@@ -131,7 +219,7 @@
           },
           "editorMode": "builder",
           "exemplar": false,
-          "expr": "myapp_healthchecks{service=\"serviceA\", instance=\"$instance\"}",
+          "expr": "myapp_healthcheck{service=\"serviceA\", instance=\"$instance\"}",
           "format": "table",
           "instant": true,
           "legendFormat": "__auto",
@@ -171,7 +259,7 @@
         "h": 5,
         "w": 4,
         "x": 4,
-        "y": 2
+        "y": 10
       },
       "id": 6,
       "options": {
@@ -196,7 +284,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "myapp_healthchecks{service=\"serviceA\", instance=\"$instance\"} == 1",
+          "expr": "myapp_healthcheck{service=\"serviceA\", instance=\"$instance\"} == 1",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -267,7 +355,7 @@
         "h": 5,
         "w": 16,
         "x": 8,
-        "y": 2
+        "y": 10
       },
       "id": 2,
       "options": {
@@ -288,7 +376,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "sum(myapp_healthchecks{service=\"serviceA\", instance=\"$instance\"})",
+          "expr": "sum(myapp_healthcheck{service=\"serviceA\", instance=\"$instance\"})",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -296,6 +384,19 @@
       ],
       "title": "Service status",
       "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 21
+      },
+      "id": 16,
+      "panels": [],
+      "title": "Incidents for $instance",
+      "type": "row"
     }
   ],
   "refresh": "10s",
@@ -307,15 +408,15 @@
       {
         "allValue": "All",
         "current": {
-          "selected": false,
-          "text": "app1:3000",
-          "value": "app1:3000"
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
         },
         "datasource": {
           "type": "prometheus",
           "uid": "PBFA97CFB590B2093"
         },
-        "definition": "label_values(myapp_healthchecks, instance)",
+        "definition": "label_values(myapp_healthcheck, instance)",
         "hide": 0,
         "includeAll": true,
         "label": "Intance",
@@ -323,7 +424,7 @@
         "name": "instance",
         "options": [],
         "query": {
-          "query": "label_values(myapp_healthchecks, instance)",
+          "query": "label_values(myapp_healthcheck, instance)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 1,
@@ -342,6 +443,6 @@
   "timezone": "",
   "title": "App monitoring",
   "uid": "I8CLlzVVk",
-  "version": 14,
+  "version": 1,
   "weekStart": ""
 }
