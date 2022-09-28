@@ -47,23 +47,39 @@ async function checkService() {
 async function simulateOneIncident(lag1, lag2, lag3) {
     const id = uuidv4();
     console.log(`A new incident occured with id ${id}`);
+    const startTime = Date.now();
+
+    metrics.getRegister().getSingleMetric(metrics.MYAPP_INCIDENT_STATUS).labels("temporary").inc(1);
     store.incident[id] = {
         id: id,
         status: "temporary",
         startedAt: Date.now(),
         timestamp: Date.now()
     }
+
+    metrics.getRegister().getSingleMetric(metrics.MYAPP_INCIDENT_STATUS).labels("temporary").dec(1);
+    metrics.getRegister().getSingleMetric(metrics.MYAPP_INCIDENT_STATUS).labels("called").inc(1);
+
     await scheduler.sleep(scheduler.getRandomInt(1000, lag1));
     store.incident[id].status = "called";
     store.incident[id].timestamp = Date.now();
+
+    metrics.getRegister().getSingleMetric(metrics.MYAPP_INCIDENT_STATUS).labels("called").dec(1);
+    metrics.getRegister().getSingleMetric(metrics.MYAPP_INCIDENT_STATUS).labels("treated").inc(1);
 
     await scheduler.sleep(scheduler.getRandomInt(1000, lag2));
     store.incident[id].status = "treated";
     store.incident[id].timestamp = Date.now();
 
+    metrics.getRegister().getSingleMetric(metrics.MYAPP_INCIDENT_STATUS).labels("treated").dec(1);
+
     await scheduler.sleep(scheduler.getRandomInt(1000, lag3));
     console.log(`End of incident with id ${id}`);
+    const endTime = Date.now();
     delete store.incident[id];
+
+    // Observe time
+    metrics.getRegister().getSingleMetric(metrics.MYAPP_INCIDENT_TIMING).observe(endTime - startTime);
 }
 
 scheduler.periodicFixedDelay(10 * 1000, checkService);
@@ -90,17 +106,17 @@ app.get('/metrics', async function (req, res) {
         treated: 0
     }
     // for (let status of ['temporary', 'called', 'treated']) {
-    //     metrics.getRegister().getSingleMetric(metrics.MYAPP_INCIDENT_STATUS).labels(status).set(0);
+    //     metrics.getRegister().getSingleMetric(metrics.MYAPP_INCIDENT_STATUS_OLD).labels(status).set(0);
     // }
     // for (let [key, incident] of Object.entries(store.incident)) {
-    //     metrics.getRegister().getSingleMetric(metrics.MYAPP_INCIDENT_STATUS).labels(incident.status).inc(1);
+    //     metrics.getRegister().getSingleMetric(metrics.MYAPP_INCIDENT_STATUS_OLD).labels(incident.status).inc(1);
     // }
     for (let [key, incident] of Object.entries(store.incident)) {
         counts[incident.status] += 1;
     }
 
     for (let [key, value] of Object.entries(counts)) {
-        metrics.getRegister().getSingleMetric(metrics.MYAPP_INCIDENT_STATUS).labels(key).set(value);
+        metrics.getRegister().getSingleMetric(metrics.MYAPP_INCIDENT_STATUS_OLD).labels(key).set(value);
     }
     
 
